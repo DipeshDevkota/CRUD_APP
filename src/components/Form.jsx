@@ -1,24 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import { assets } from '../assets/assets.js';
 import validator from 'validator';
+import Table from './Table.jsx';
 
 const Form = () => {
   const [image, setImage] = useState(null);
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState('Nepal');
+  const [records,setRecords]= useState([]);
+  const [editPosition,setEditPosition]= useState(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     city: '',
     district: '',
-    province: '',
+    province: 'Province 1',
+    country: 'Nepal',
     day: '',
     month: '',
-    year: ''
+    year: '',
+    image: null,
   });
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState({});
+
+
+
 
   // Fetch countries from the API
   useEffect(() => {
@@ -139,13 +147,48 @@ const Form = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+  
     if (validateForm()) {
-      // Handle form submission
-      console.log('Form submitted successfully with data:', formData);
+      const dataToSubmit = {
+        ...formData,
+        country: selectedCountry,
+        image: image ? URL.createObjectURL(image) : null
+      };
+  
+      if (editPosition !== null) {
+        const updatedRecords = records.map((record, index) =>
+          index === editPosition ? dataToSubmit : record
+        );
+        setRecords(updatedRecords);
+        setEditPosition(null);
+      } else {
+        setRecords([...records, dataToSubmit]);
+      }
+  
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        city: '',
+        district: '',
+        province: '',
+        day: '',
+        month: '',
+        year: ''
+      });
+      setImage(null); // Clear the image after submission
     }
+  };
+  
+
+  const Edit=(i)=>{
+    setEditPosition(i);
+    setFormData(records[i]);
   };
 
   return (
+    <div className='flex justify-center flex-col'>
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-8 w-full max-w-lg">
         <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">User Information</h1>
@@ -313,9 +356,19 @@ const Form = () => {
           type="submit"
           className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          Submit
+          {editPosition!== null ?'Update':'Add'}
+          
         </button>
       </form>
+
+   
+   <div/>
+    </div>
+
+    <div>
+    <Table records={records} setRecords={setRecords} onEdit= {Edit}/>
+      {console.log(records)}
+    </div>
     </div>
   );
 };
