@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { assets } from '../assets/assets.js';
 import validator from 'validator';
 import Table from './Table.jsx';
 
@@ -38,6 +37,19 @@ const Form = () => {
     };
     fetchCountries();
   }, []);
+
+  // Load records from localStorage on component mount
+  useEffect(() => {
+    const storedRecords = localStorage.getItem('userRecords');
+    if (storedRecords) {
+      setRecords(JSON.parse(storedRecords));
+    }
+  }, []);
+
+  // Save records to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('userRecords', JSON.stringify(records));
+  }, [records]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -194,6 +206,7 @@ const Form = () => {
         <form onSubmit={handleSubmit} className="bg-white shadow-2xl rounded-lg p-8 w-full max-w-lg">
           <h1 className="text-2xl font-bold mb-6 text-center text-gray-700">User Information</h1>
 
+          {/* Form Fields... */}
           <label className="block mb-4 relative">
             <h1 className="text-gray-600 font-semibold mb-2">Name <span className="text-red-500">*</span></h1>
             <input
@@ -350,6 +363,8 @@ const Form = () => {
             {errors.image && <p className="text-red-500 text-sm mt-2">{errors.image}</p>}
             {success.image && <p className="text-green-500 text-sm mt-2">{success.image}</p>}
           </label>
+
+
 
           <button
             type="submit"

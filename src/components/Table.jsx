@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Table = ({ records, setRecords, onEdit }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -6,6 +6,13 @@ const Table = ({ records, setRecords, onEdit }) => {
   const [sortField, setSortField] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const recordsPerPage = 5;
+
+  useEffect(() => {
+    const storedRecords = JSON.parse(localStorage.getItem('records'));
+    if (storedRecords) {
+      setRecords(storedRecords);
+    }
+  }, [setRecords]);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
@@ -35,6 +42,8 @@ const Table = ({ records, setRecords, onEdit }) => {
   const handleDelete = (index) => {
     const updatedRecords = records.filter((_, i) => i !== indexOfFirstRecord + index);
     setRecords(updatedRecords);
+    localStorage.setItem('records', JSON.stringify(updatedRecords));
+
     if (currentPage > 1 && currentRecords.length === 1) {
       setCurrentPage(currentPage - 1);
     }
@@ -54,8 +63,8 @@ const Table = ({ records, setRecords, onEdit }) => {
 
   return (
     <div className="mt-7">
-      <div className="flex  justify-between items-center mb-4">
-        <h2 className="text-[20vh]  ml-[70vh] flex text-slate-500 font-semibold justify-center items-center">Records</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-[20vh] ml-[70vh] flex text-slate-500 font-semibold justify-center items-center">Records</h2>
         <input
           type="text"
           placeholder="Search by Name"
@@ -64,7 +73,7 @@ const Table = ({ records, setRecords, onEdit }) => {
           className="border rounded-lg px-9 w-72 py-4 mr-36 mt-14"
         />
       </div>
-      
+
       <table className="min-w-full bg-white border rounded-lg">
         <thead>
           <tr>
@@ -125,8 +134,7 @@ const Table = ({ records, setRecords, onEdit }) => {
         <button
           onClick={handlePreviousPage}
           disabled={currentPage === 1}
-          className="bg-gray-400 text-gray-700 px-10 py-6 hover:bg-slate-400  cursor-pointer rounded-lg text-3xl ml-10 mb-10 mt-7"
-
+          className="bg-gray-400 text-gray-700 px-10 py-6 hover:bg-lime-50 cursor-pointer rounded-lg text-3xl ml-10 mb-10 mt-7"
         >
           Previous
         </button>
@@ -134,7 +142,7 @@ const Table = ({ records, setRecords, onEdit }) => {
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages}
-          className="bg-gray-400 text-gray-700 px-10 py-6 hover:bg-slate-400  cursor-pointer rounded-lg text-3xl mr-10 mb-10 mt-7"
+          className="bg-gray-400 text-gray-700 px-10 py-6 hover:bg-lime-50 cursor-pointer rounded-lg text-3xl mr-10 mb-10 mt-7"
         >
           Next
         </button>
